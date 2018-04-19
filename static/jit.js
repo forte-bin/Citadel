@@ -278,32 +278,6 @@ $.zip = function() {
   return ans;
 };
 
-/*
-  Method: rgbToHex
-  
-  Converts an RGB array into a Hex string.
-  
-  Parameters:
-  
-  srcArray - (array) An array with R, G and B values
-  
-  Example:
-  (start code js)
-  $jit.util.rgbToHex([255, 255, 255]); //'#ffffff'
-  (end code)
-*/
-$.rgbToHex = function(srcArray, array) {
-  if (srcArray.length < 3)
-    return null;
-  if (srcArray.length == 4 && srcArray[3] == 0 && !array)
-    return 'transparent';
-  var hex = [];
-  for ( var i = 0; i < 3; i++) {
-    var bit = (srcArray[i] - 0).toString(16);
-    hex.push(bit.length == 1 ? '0' + bit : bit);
-  }
-  return array ? hex : '#' + hex.join('');
-};
 
 /*
   Method: hexToRgb
@@ -1186,170 +1160,6 @@ Options.Edge = {
 };
 
 
-/*
- * File: Options.Fx.js
- *
-*/
-
-/*
-  Object: Options.Fx
-
-  Provides animation options like duration of the animations, frames per second and animation transitions.  
-
-  Syntax:
-  
-  (start code js)
-    Options.Fx = {
-      fps:40,
-      duration: 2500,
-      transition: $jit.Trans.Quart.easeInOut,
-      clearCanvas: true
-    };
-  (end code)
-  
-  Example:
-  
-  (start code js)
-  var viz = new $jit.Viz({
-    duration: 1000,
-    fps: 35,
-    transition: $jit.Trans.linear
-  });
-  (end code)
-  
-  Parameters:
-  
-  clearCanvas - (boolean) Default's *true*. Whether to clear the frame/canvas when the viz is plotted or animated.
-  duration - (number) Default's *2500*. Duration of the animation in milliseconds.
-  fps - (number) Default's *40*. Frames per second.
-  transition - (object) Default's *$jit.Trans.Quart.easeInOut*. The transition used for the animations. See below for a more detailed explanation.
-  
-  Object: $jit.Trans
-  
-  This object is used for specifying different animation transitions in all visualizations.
-
-  There are many different type of animation transitions.
-
-  linear:
-
-  Displays a linear transition
-
-  >Trans.linear
-  
-  (see Linear.png)
-
-  Quad:
-
-  Displays a Quadratic transition.
-
-  >Trans.Quad.easeIn
-  >Trans.Quad.easeOut
-  >Trans.Quad.easeInOut
-  
- (see Quad.png)
-
- Cubic:
-
- Displays a Cubic transition.
-
- >Trans.Cubic.easeIn
- >Trans.Cubic.easeOut
- >Trans.Cubic.easeInOut
-
- (see Cubic.png)
-
- Quart:
-
- Displays a Quartetic transition.
-
- >Trans.Quart.easeIn
- >Trans.Quart.easeOut
- >Trans.Quart.easeInOut
-
- (see Quart.png)
-
- Quint:
-
- Displays a Quintic transition.
-
- >Trans.Quint.easeIn
- >Trans.Quint.easeOut
- >Trans.Quint.easeInOut
-
- (see Quint.png)
-
- Expo:
-
- Displays an Exponential transition.
-
- >Trans.Expo.easeIn
- >Trans.Expo.easeOut
- >Trans.Expo.easeInOut
-
- (see Expo.png)
-
- Circ:
-
- Displays a Circular transition.
-
- >Trans.Circ.easeIn
- >Trans.Circ.easeOut
- >Trans.Circ.easeInOut
-
- (see Circ.png)
-
- Sine:
-
- Displays a Sineousidal transition.
-
- >Trans.Sine.easeIn
- >Trans.Sine.easeOut
- >Trans.Sine.easeInOut
-
- (see Sine.png)
-
- Back:
-
- >Trans.Back.easeIn
- >Trans.Back.easeOut
- >Trans.Back.easeInOut
-
- (see Back.png)
-
- Bounce:
-
- Bouncy transition.
-
- >Trans.Bounce.easeIn
- >Trans.Bounce.easeOut
- >Trans.Bounce.easeInOut
-
- (see Bounce.png)
-
- Elastic:
-
- Elastic curve.
-
- >Trans.Elastic.easeIn
- >Trans.Elastic.easeOut
- >Trans.Elastic.easeInOut
-
- (see Elastic.png)
- 
- Based on:
-     
- Easing and Transition animation methods are based in the MooTools Framework <http://mootools.net>. Copyright (c) 2006-2010 Valerio Proietti, <http://mad4milk.net/>. MIT license <http://mootools.net/license.txt>.
-
-
-*/
-Options.Fx = {
-  $extend: true,
-  
-  fps:40,
-  duration: 2500,
-  transition: $jit.Trans.Quart.easeInOut,
-  clearCanvas: true
-};
 
 /*
  * File: Options.Label.js
@@ -1358,14 +1168,14 @@ Options.Fx = {
 /*
   Object: Options.Label
 
-  Provides styling for Labels such as font size, family, etc. Also sets Node labels as HTML,r Native canvas elements.  
+  Provides styling for Labels such as font size, family, etc. Also sets Node labels as HTML,r canvas elements.  
 
   Syntax:
   
   (start code js)
     Options.Label = {
       overridable: false,
-      type: 'HTML', 'Native'
+      type: 'HTML', 
       style: ' ',
       size: 10,
       family: 'sans-serif',
@@ -2045,7 +1855,7 @@ var Canvas;
     
     createLabelContainer: function(type, idLabel, dim) {
       var NS = 'http://www.w3.org/2000/';
-      if(type == 'HTML' || type == 'Native') {
+      if(type == 'HTML') {
         return $E('div', {
           'id': idLabel,
           'style': {
@@ -2164,41 +1974,7 @@ var Canvas;
       this.viz.plot(this);
     }
   });
-  //background canvases
-  //TODO(nico): document this!
-  Canvas.Background = {};
-  Canvas.Background.Circles = new Class({
-    initialize: function(viz, options) {
-      this.viz = viz;
-      this.config = $.merge({
-        idSuffix: '-bkcanvas',
-        levelDistance: 100,
-        numberOfCircles: 6,
-        CanvasStyles: {},
-        offset: 0
-      }, options);
-    },
-    resize: function(width, height, base) {
-      this.plot(base);
-    },
-    plot: function(base) {
-      var canvas = base.canvas,
-          ctx = base.getCtx(),
-          conf = this.config,
-          styles = conf.CanvasStyles;
-      //set canvas styles
-      for(var s in styles) ctx[s] = styles[s];
-      var n = conf.numberOfCircles,
-          rho = conf.levelDistance;
-      for(var i=1; i<=n; i++) {
-        ctx.beginPath();
-        ctx.arc(0, 0, rho * i, 0, 2 * Math.PI, false);
-        ctx.stroke();
-        ctx.closePath();
-      }
-      //TODO(nico): print labels too!
-    }
-  });
+  
 })();
 
 
@@ -2983,10 +2759,10 @@ var Accessors;
     
     (start code js)
       var node = viz.getNode('nodeId');
-      //set start and end values
+      set start and end values
       node.setData('width', 10, 'start');
       node.setData('width', 30, 'end');
-      //will animate nodes width property
+      will animate nodes width property
       viz.fx.animate({
         modes: ['node-property:width'],
         duration: 1000
@@ -2995,43 +2771,6 @@ var Accessors;
     */
     setData: function(prop, value, type) {
       setDataInternal.call(this, "", prop, value, type);
-    },
-
-    /*
-    Method: setDataset
-
-    Convenience method to set multiple data values at once.
-    
-    Parameters:
-    
-    types - (array|string) A set of 'current', 'end' or 'start' values.
-    obj - (object) A hash containing the names and values of the properties to be altered.
-
-    Example:
-    (start code js)
-      node.setDataset(['current', 'end'], {
-        'width': [100, 5],
-        'color': ['#fff', '#ccc']
-      });
-      //...or also
-      node.setDataset('end', {
-        'width': 5,
-        'color': '#ccc'
-      });
-    (end code)
-    
-    See also: 
-    
-    <Accessors.setData>
-    
-    */
-    setDataset: function(types, obj) {
-      types = $.splat(types);
-      for(var attr in obj) {
-        for(var i=0, val = $.splat(obj[attr]), l=types.length; i<l; i++) {
-          this.setData(attr, val[i], types[i]);
-        }
-      }
     },
     
     /*
@@ -3102,10 +2841,10 @@ var Accessors;
     
     (start code js)
       var node = viz.getNode('nodeId');
-      //set start and end values
+      set start and end values
       node.setCanvasStyle('shadowBlur', 10, 'start');
       node.setCanvasStyle('shadowBlur', 30, 'end');
-      //will animate nodes canvas style property for nodes
+      will animate nodes canvas style property for nodes
       viz.fx.animate({
         modes: ['node-style:shadowBlur'],
         duration: 1000
@@ -3143,22 +2882,7 @@ var Accessors;
       }
     },
 
-    /*
-    Method: removeCanvasStyle
-
-    Remove canvas style properties from data.
-
-    Parameters:
-    
-    A variable number of canvas style strings.
-
-    See also:
-    
-    <Accessors.removeData>.
-    */
-    removeCanvasStyle: function() {
-      removeDataInternal.call(this, 'canvas', Array.prototype.slice.call(arguments));
-    },
+   
 
     /*
     Method: getLabelData
@@ -3205,10 +2929,10 @@ var Accessors;
     
     (start code js)
       var node = viz.getNode('nodeId');
-      //set start and end values
+      set start and end values
       node.setLabelData('size', 10, 'start');
       node.setLabelData('size', 30, 'end');
-      //will animate nodes label size
+      will animate nodes label size
       viz.fx.animate({
         modes: ['label-property:size'],
         duration: 1000
@@ -3223,45 +2947,6 @@ var Accessors;
       setDataInternal.call(this, 'label', prop, value, type);
     },
 
-    /*
-    Method: setLabelDataset
-
-    Convenience function to set multiple label data at once.
-
-    Parameters:
-    
-    types - (array|string) A set of 'current', 'end' or 'start' values.
-    obj - (object) A hash containing the names and values of the properties to be altered.
-
-    See also:
-    
-    <Accessors.setDataset>.
-    */
-    setLabelDataset: function(types, obj) {
-      types = $.splat(types);
-      for(var attr in obj) {
-        for(var i=0, val = $.splat(obj[attr]), l=types.length; i<l; i++) {
-          this.setLabelData(attr, val[i], types[i]);
-        }
-      }
-    },
-
-    /*
-    Method: removeLabelData
-
-    Remove label properties from data.
-    
-    Parameters:
-    
-    A variable number of label property strings.
-
-    See also:
-    
-    <Accessors.removeData>.
-    */
-    removeLabelData: function() {
-      removeDataInternal.call(this, 'label', Array.prototype.slice.call(arguments));
-    }
   };
 })();
 
@@ -4686,144 +4371,6 @@ var NodeHelper = {
     'contains': $.lambda(false)
   },
   /*
-   Object: NodeHelper.circle
-   */
-  'circle': {
-    /*
-     Method: render
-     
-     Renders a circle into the canvas.
-     
-     Parameters:
-     
-     type - (string) Possible options are 'fill' or 'stroke'.
-     pos - (object) An *x*, *y* object with the position of the center of the circle.
-     radius - (number) The radius of the circle to be rendered.
-     canvas - (object) A <Canvas> instance.
-     
-     Example:
-     (start code js)
-     NodeHelper.circle.render('fill', { x: 10, y: 30 }, 30, viz.canvas);
-     (end code)
-     */
-    'render': function(type, pos, radius, canvas){
-      var ctx = canvas.getCtx();
-      ctx.beginPath();
-      ctx.arc(pos.x, pos.y, radius, 0, Math.PI * 2, true);
-      ctx.closePath();
-      ctx[type]();
-    },
-    /*
-    Method: contains
-    
-    Returns *true* if *pos* is contained in the area of the shape. Returns *false* otherwise.
-    
-    Parameters:
-    
-    npos - (object) An *x*, *y* object with the <Graph.Node> position.
-    pos - (object) An *x*, *y* object with the position to check.
-    radius - (number) The radius of the rendered circle.
-    
-    Example:
-    (start code js)
-    NodeHelper.circle.contains({ x: 10, y: 30 }, { x: 15, y: 35 }, 30); //true
-    (end code)
-    */
-    'contains': function(npos, pos, radius){
-      var diffx = npos.x - pos.x, 
-          diffy = npos.y - pos.y, 
-          diff = diffx * diffx + diffy * diffy;
-      return diff <= radius * radius;
-    }
-  },
-  /*
-  Object: NodeHelper.ellipse
-  */
-  'ellipse': {
-    /*
-    Method: render
-    
-    Renders an ellipse into the canvas.
-    
-    Parameters:
-    
-    type - (string) Possible options are 'fill' or 'stroke'.
-    pos - (object) An *x*, *y* object with the position of the center of the ellipse.
-    width - (number) The width of the ellipse.
-    height - (number) The height of the ellipse.
-    canvas - (object) A <Canvas> instance.
-    
-    Example:
-    (start code js)
-    NodeHelper.ellipse.render('fill', { x: 10, y: 30 }, 30, 40, viz.canvas);
-    (end code)
-    */
-    'render': function(type, pos, width, height, canvas){
-      var ctx = canvas.getCtx(),
-          scalex = 1,
-          scaley = 1,
-          scaleposx = 1,
-          scaleposy = 1,
-          radius = 0;
-
-      if (width > height) {
-          radius = width / 2;
-          scaley = height / width;
-          scaleposy = width / height;
-      } else {
-          radius = height / 2;
-          scalex = width / height;
-          scaleposx = height / width;
-      }
-
-      ctx.save();
-      ctx.scale(scalex, scaley);
-      ctx.beginPath();
-      ctx.arc(pos.x * scaleposx, pos.y * scaleposy, radius, 0, Math.PI * 2, true);
-      ctx.closePath();
-      ctx[type]();
-      ctx.restore();
-    },
-    /*
-    Method: contains
-    
-    Returns *true* if *pos* is contained in the area of the shape. Returns *false* otherwise.
-    
-    Parameters:
-    
-    npos - (object) An *x*, *y* object with the <Graph.Node> position.
-    pos - (object) An *x*, *y* object with the position to check.
-    width - (number) The width of the rendered ellipse.
-    height - (number) The height of the rendered ellipse.
-    
-    Example:
-    (start code js)
-    NodeHelper.ellipse.contains({ x: 10, y: 30 }, { x: 15, y: 35 }, 30, 40);
-    (end code)
-    */
-    'contains': function(npos, pos, width, height){
-      var radius = 0,
-          scalex = 1,
-          scaley = 1,
-          diffx = 0,
-          diffy = 0,
-          diff = 0;
-
-      if (width > height) {
-	      radius = width / 2;
-	      scaley = height / width;
-      } else {
-          radius = height / 2;
-          scalex = width / height;
-      }
-
-      diffx = (npos.x - pos.x) * (1 / scalex);
-      diffy = (npos.y - pos.y) * (1 / scaley);
-      diff = diffx * diffx + diffy * diffy;
-      return diff <= radius * radius;
-    }
-  },
-  /*
   Object: NodeHelper.square
   */
   'square': {
@@ -4913,122 +4460,6 @@ var NodeHelper = {
     'contains': function(npos, pos, width, height){
       return Math.abs(pos.x - npos.x) <= width / 2
           && Math.abs(pos.y - npos.y) <= height / 2;
-    }
-  },
-  /*
-  Object: NodeHelper.triangle
-  */
-  'triangle': {
-    /*
-    Method: render
-    
-    Renders a triangle into the canvas.
-    
-    Parameters:
-    
-    type - (string) Possible options are 'fill' or 'stroke'.
-    pos - (object) An *x*, *y* object with the position of the center of the triangle.
-    dim - (number) Half the base and half the height of the triangle.
-    canvas - (object) A <Canvas> instance.
-    
-    Example:
-    (start code js)
-    NodeHelper.triangle.render('stroke', { x: 10, y: 30 }, 40, viz.canvas);
-    (end code)
-    */
-    'render': function(type, pos, dim, canvas){
-      var ctx = canvas.getCtx(), 
-          c1x = pos.x, 
-          c1y = pos.y - dim, 
-          c2x = c1x - dim, 
-          c2y = pos.y + dim, 
-          c3x = c1x + dim, 
-          c3y = c2y;
-      ctx.beginPath();
-      ctx.moveTo(c1x, c1y);
-      ctx.lineTo(c2x, c2y);
-      ctx.lineTo(c3x, c3y);
-      ctx.closePath();
-      ctx[type]();
-    },
-    /*
-    Method: contains
-    
-    Returns *true* if *pos* is contained in the area of the shape. Returns *false* otherwise.
-    
-    Parameters:
-    
-    npos - (object) An *x*, *y* object with the <Graph.Node> position.
-    pos - (object) An *x*, *y* object with the position to check.
-    dim - (number) Half the base and half the height of the triangle.
-    
-    Example:
-    (start code js)
-    NodeHelper.triangle.contains({ x: 10, y: 30 }, { x: 15, y: 35 }, 30);
-    (end code)
-    */
-    'contains': function(npos, pos, dim) {
-      return NodeHelper.circle.contains(npos, pos, dim);
-    }
-  },
-  /*
-  Object: NodeHelper.star
-  */
-  'star': {
-    /*
-    Method: render
-    
-    Renders a star (concave decagon) into the canvas.
-    
-    Parameters:
-    
-    type - (string) Possible options are 'fill' or 'stroke'.
-    pos - (object) An *x*, *y* object with the position of the center of the star.
-    dim - (number) The length of a side of a concave decagon.
-    canvas - (object) A <Canvas> instance.
-    
-    Example:
-    (start code js)
-    NodeHelper.star.render('stroke', { x: 10, y: 30 }, 40, viz.canvas);
-    (end code)
-    */
-    'render': function(type, pos, dim, canvas){
-      var ctx = canvas.getCtx(), 
-          pi5 = Math.PI / 5;
-      ctx.save();
-      ctx.translate(pos.x, pos.y);
-      ctx.beginPath();
-      ctx.moveTo(dim, 0);
-      for (var i = 0; i < 9; i++) {
-        ctx.rotate(pi5);
-        if (i % 2 == 0) {
-          ctx.lineTo((dim / 0.525731) * 0.200811, 0);
-        } else {
-          ctx.lineTo(dim, 0);
-        }
-      }
-      ctx.closePath();
-      ctx[type]();
-      ctx.restore();
-    },
-    /*
-    Method: contains
-    
-    Returns *true* if *pos* is contained in the area of the shape. Returns *false* otherwise.
-    
-    Parameters:
-    
-    npos - (object) An *x*, *y* object with the <Graph.Node> position.
-    pos - (object) An *x*, *y* object with the position to check.
-    dim - (number) The length of a side of a concave decagon.
-    
-    Example:
-    (start code js)
-    NodeHelper.star.contains({ x: 10, y: 30 }, { x: 15, y: 35 }, 30);
-    (end code)
-    */
-    'contains': function(npos, pos, dim) {
-      return NodeHelper.circle.contains(npos, pos, dim);
     }
   }
 };
@@ -5171,134 +4602,6 @@ var EdgeHelper = {
       return EdgeHelper.line.contains(posFrom, posTo, pos, epsilon);
     }
   },
-  /*
-    Object: EdgeHelper.hyperline
-  */
-  'hyperline': {
-    /*
-    Method: render
-    
-    Renders a hyperline into the canvas. A hyperline are the lines drawn for the <Hypertree> visualization.
-    
-    Parameters:
-    
-    from - (object) An *x*, *y* object with the starting position of the hyperline. *x* and *y* must belong to [0, 1).
-    to - (object) An *x*, *y* object with the ending position of the hyperline. *x* and *y* must belong to [0, 1).
-    r - (number) The scaling factor.
-    canvas - (object) A <Canvas> instance.
-    
-    Example:
-    (start code js)
-    EdgeHelper.hyperline.render({ x: 10, y: 30 }, { x: 10, y: 50 }, 100, viz.canvas);
-    (end code)
-    */
-    'render': function(from, to, r, canvas){
-      var ctx = canvas.getCtx();  
-      var centerOfCircle = computeArcThroughTwoPoints(from, to);
-      if (centerOfCircle.a > 1000 || centerOfCircle.b > 1000
-          || centerOfCircle.ratio < 0) {
-        ctx.beginPath();
-        ctx.moveTo(from.x * r, from.y * r);
-        ctx.lineTo(to.x * r, to.y * r);
-        ctx.stroke();
-      } else {
-        var angleBegin = Math.atan2(to.y - centerOfCircle.y, to.x
-            - centerOfCircle.x);
-        var angleEnd = Math.atan2(from.y - centerOfCircle.y, from.x
-            - centerOfCircle.x);
-        var sense = sense(angleBegin, angleEnd);
-        ctx.beginPath();
-        ctx.arc(centerOfCircle.x * r, centerOfCircle.y * r, centerOfCircle.ratio
-            * r, angleBegin, angleEnd, sense);
-        ctx.stroke();
-      }
-      /*      
-        Calculates the arc parameters through two points.
-        
-        More information in <http://en.wikipedia.org/wiki/Poincar%C3%A9_disc_model#Analytic_geometry_constructions_in_the_hyperbolic_plane> 
-      
-        Parameters:
-      
-        p1 - A <Complex> instance.
-        p2 - A <Complex> instance.
-        scale - The Disk's diameter.
-      
-        Returns:
-      
-        An object containing some arc properties.
-      */
-      function computeArcThroughTwoPoints(p1, p2){
-        var aDen = (p1.x * p2.y - p1.y * p2.x), bDen = aDen;
-        var sq1 = p1.squaredNorm(), sq2 = p2.squaredNorm();
-        // Fall back to a straight line
-        if (aDen == 0)
-          return {
-            x: 0,
-            y: 0,
-            ratio: -1
-          };
-    
-        var a = (p1.y * sq2 - p2.y * sq1 + p1.y - p2.y) / aDen;
-        var b = (p2.x * sq1 - p1.x * sq2 + p2.x - p1.x) / bDen;
-        var x = -a / 2;
-        var y = -b / 2;
-        var squaredRatio = (a * a + b * b) / 4 - 1;
-        // Fall back to a straight line
-        if (squaredRatio < 0)
-          return {
-            x: 0,
-            y: 0,
-            ratio: -1
-          };
-        var ratio = Math.sqrt(squaredRatio);
-        var out = {
-          x: x,
-          y: y,
-          ratio: ratio > 1000? -1 : ratio,
-          a: a,
-          b: b
-        };
-    
-        return out;
-      }
-      /*      
-        Sets angle direction to clockwise (true) or counterclockwise (false). 
-         
-        Parameters: 
-      
-           angleBegin - Starting angle for drawing the arc. 
-           angleEnd - The HyperLine will be drawn from angleBegin to angleEnd. 
-      
-        Returns: 
-      
-           A Boolean instance describing the sense for drawing the HyperLine. 
-      */
-      function sense(angleBegin, angleEnd){
-        return (angleBegin < angleEnd)? ((angleBegin + Math.PI > angleEnd)? false
-            : true) : ((angleEnd + Math.PI > angleBegin)? true : false);
-      }
-    },
-    /*
-    Method: contains
-    
-    Not Implemented
-    
-    Returns *true* if *pos* is contained in the area of the shape. Returns *false* otherwise.
-    
-    Parameters:
-    
-    posFrom - (object) An *x*, *y* object with a <Graph.Node> position.
-    posTo - (object) An *x*, *y* object with a <Graph.Node> position.
-    pos - (object) An *x*, *y* object with the position to check.
-    epsilon - (number) The dimension of the shape.
-    
-    Example:
-    (start code js)
-    EdgeHelper.hyperline.contains({ x: 10, y: 30 }, { x: 15, y: 35 }, { x: 15, y: 35 }, 30);
-    (end code)
-    */
-    'contains': $.lambda(false)
-  }
 };
 
 
@@ -5685,106 +4988,7 @@ Graph.Plot = {
       })).start();
     },
     
-    /*
-      nodeFx
-   
-      Apply animation to node properties like color, width, height, dim, etc.
-  
-      Parameters:
-  
-      options - Animation options. This object properties is described below
-      elements - The Elements to be transformed. This is an object that has a properties
-      
-      (start code js)
-      'elements': {
-        //can also be an array of ids
-        'id': 'id-of-node-to-transform',
-        //properties to be modified. All properties are optional.
-        'properties': {
-          'color': '#ccc', //some color
-          'width': 10, //some width
-          'height': 10, //some height
-          'dim': 20, //some dim
-          'lineWidth': 10 //some line width
-        } 
-      }
-      (end code)
-      
-      - _reposition_ Whether to recalculate positions and add a motion animation. 
-      This might be used when changing _width_ or _height_ properties in a <Layouts.Tree> like layout. Default's *false*.
-      
-      - _onComplete_ A method that is called when the animation completes.
-      
-      ...and all other <Graph.Plot.animate> options like _duration_, _fps_, _transition_, etc.
-  
-      Example:
-      (start code js)
-       var rg = new RGraph(canvas, config); //can be also Hypertree or ST
-       rg.fx.nodeFx({
-         'elements': {
-           'id':'mynodeid',
-           'properties': {
-             'color':'#ccf'
-           },
-           'transition': Trans.Quart.easeOut
-         }
-       });
-      (end code)    
-   */
-   nodeFx: function(opt) {
-     var viz = this.viz,
-         graph  = viz.graph,
-         animation = this.nodeFxAnimation,
-         options = $.merge(this.viz.config, {
-           'elements': {
-             'id': false,
-             'properties': {}
-           },
-           'reposition': false
-         });
-     opt = $.merge(options, opt || {}, {
-       onBeforeCompute: $.empty,
-       onAfterCompute: $.empty
-     });
-     //check if an animation is running
-     animation.stopTimer();
-     var props = opt.elements.properties;
-     //set end values for nodes
-     if(!opt.elements.id) {
-       graph.eachNode(function(n) {
-         for(var prop in props) {
-           n.setData(prop, props[prop], 'end');
-         }
-       });
-     } else {
-       var ids = $.splat(opt.elements.id);
-       $.each(ids, function(id) {
-         var n = graph.getNode(id);
-         if(n) {
-           for(var prop in props) {
-             n.setData(prop, props[prop], 'end');
-           }
-         }
-       });
-     }
-     //get keys
-     var propnames = [];
-     for(var prop in props) propnames.push(prop);
-     //add node properties modes
-     var modes = ['node-property:' + propnames.join(':')];
-     //set new node positions
-     if(opt.reposition) {
-       modes.push('linear');
-       viz.compute('end');
-     }
-     //animate
-     this.animate($.merge(opt, {
-       modes: modes,
-       type: 'nodefx'
-     }));
-   },
 
-    
     /*
        Method: plot
     
@@ -5949,151 +5153,6 @@ Graph.Plot = {
 };
 
 /*
-  Object: Graph.Plot3D
-  
-  <Graph> 3D rendering and animation methods.
-  
-  Properties:
-  
-  nodeHelper - <NodeHelper> object.
-  edgeHelper - <EdgeHelper> object.
-
-*/
-Graph.Plot3D = $.merge(Graph.Plot, {
-  Interpolator: {
-    'linear': function(elem, props, delta) {
-      var from = elem.startPos.getc(true);
-      var to = elem.endPos.getc(true);
-      elem.pos.setc(this.compute(from.x, to.x, delta), 
-                    this.compute(from.y, to.y, delta),
-                    this.compute(from.z, to.z, delta));
-    }
-  },
-  
-  plotNode: function(node, canvas) {
-    if(node.getData('type') == 'none') return;
-    this.plotElement(node, canvas, {
-      getAlpha: function() {
-        return node.getData('alpha');
-      }
-    });
-  },
-  
-  plotLine: function(adj, canvas) {
-    if(adj.getData('type') == 'none') return;
-    this.plotElement(adj, canvas, {
-      getAlpha: function() {
-        return Math.min(adj.nodeFrom.getData('alpha'),
-                        adj.nodeTo.getData('alpha'),
-                        adj.getData('alpha'));
-      }
-    });
-  },
-  
-  plotElement: function(elem, canvas, opt) {
-    var gl = canvas.getCtx(),
-        viewMatrix = new Matrix4,
-        lighting = canvas.config.Scene.Lighting,
-        wcanvas = canvas.canvases[0],
-        program = wcanvas.program,
-        camera = wcanvas.camera;
-    
-    if(!elem.geometry) {
-      elem.geometry = new O3D[elem.getData('type')];
-    }
-    elem.geometry.update(elem);
-    if(!elem.webGLVertexBuffer) {
-      var vertices = [],
-          faces = [],
-          normals = [],
-          vertexIndex = 0,
-          geom = elem.geometry;
-      
-      for(var i=0, vs=geom.vertices, fs=geom.faces, fsl=fs.length; i<fsl; i++) {
-        var face = fs[i],
-            v1 = vs[face.a],
-            v2 = vs[face.b],
-            v3 = vs[face.c],
-            v4 = face.d? vs[face.d] : false,
-            n = face.normal;
-        
-        vertices.push(v1.x, v1.y, v1.z);
-        vertices.push(v2.x, v2.y, v2.z);
-        vertices.push(v3.x, v3.y, v3.z);
-        if(v4) vertices.push(v4.x, v4.y, v4.z);
-            
-        normals.push(n.x, n.y, n.z);
-        normals.push(n.x, n.y, n.z);
-        normals.push(n.x, n.y, n.z);
-        if(v4) normals.push(n.x, n.y, n.z);
-            
-        faces.push(vertexIndex, vertexIndex +1, vertexIndex +2);
-        if(v4) {
-          faces.push(vertexIndex, vertexIndex +2, vertexIndex +3);
-          vertexIndex += 4;
-        } else {
-          vertexIndex += 3;
-        }
-      }
-      //create and store vertex data
-      elem.webGLVertexBuffer = gl.createBuffer();
-      gl.bindBuffer(gl.ARRAY_BUFFER, elem.webGLVertexBuffer);
-      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
-      //create and store faces index data
-      elem.webGLFaceBuffer = gl.createBuffer();
-      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, elem.webGLFaceBuffer);
-      gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(faces), gl.STATIC_DRAW);
-      elem.webGLFaceCount = faces.length;
-      //calculate vertex normals and store them
-      elem.webGLNormalBuffer = gl.createBuffer();
-      gl.bindBuffer(gl.ARRAY_BUFFER, elem.webGLNormalBuffer);
-      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(normals), gl.STATIC_DRAW);
-    }
-    viewMatrix.multiply(camera.matrix, elem.geometry.matrix);
-    //send matrix data
-    gl.uniformMatrix4fv(program.viewMatrix, false, viewMatrix.flatten());
-    gl.uniformMatrix4fv(program.projectionMatrix, false, camera.projectionMatrix.flatten());
-    //send normal matrix for lighting
-    var normalMatrix = Matrix4.makeInvert(viewMatrix);
-    normalMatrix.$transpose();
-    gl.uniformMatrix4fv(program.normalMatrix, false, normalMatrix.flatten());
-    //send color data
-    var color = $.hexToRgb(elem.getData('color'));
-    color.push(opt.getAlpha());
-    gl.uniform4f(program.color, color[0] / 255, color[1] / 255, color[2] / 255, color[3]);
-    //send lighting data
-    gl.uniform1i(program.enableLighting, lighting.enable);
-    if(lighting.enable) {
-      //set ambient light color
-      if(lighting.ambient) {
-        var acolor = lighting.ambient;
-        gl.uniform3f(program.ambientColor, acolor[0], acolor[1], acolor[2]);
-      }
-      //set directional light
-      if(lighting.directional) {
-        var dir = lighting.directional,
-            color = dir.color,
-            pos = dir.direction,
-            vd = new Vector3(pos.x, pos.y, pos.z).normalize().$scale(-1);
-        gl.uniform3f(program.lightingDirection, vd.x, vd.y, vd.z);
-        gl.uniform3f(program.directionalColor, color[0], color[1], color[2]);
-      }
-    }
-    //send vertices data
-    gl.bindBuffer(gl.ARRAY_BUFFER, elem.webGLVertexBuffer);
-    gl.vertexAttribPointer(program.position, 3, gl.FLOAT, false, 0, 0);
-    //send normals data
-    gl.bindBuffer(gl.ARRAY_BUFFER, elem.webGLNormalBuffer);
-    gl.vertexAttribPointer(program.normal, 3, gl.FLOAT, false, 0, 0);
-    //draw!
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, elem.webGLFaceBuffer );
-    gl.drawElements(gl.TRIANGLES, elem.webGLFaceCount, gl.UNSIGNED_SHORT, 0);
-  }
-});
-
-
-
-/*
  * File: Graph.Label.js
  *
 */
@@ -6111,76 +5170,12 @@ Graph.Plot3D = $.merge(Graph.Plot, {
 
    For example, the Graph.Label interface is implemented as <Graph.Label.HTML> to provide
    HTML label elements. 
-   The <Graph.Label.Native> interface implements these methods with the native Canvas text rendering functions.
+  
    
-   All subclasses (<Graph.Label.HTML>,<Graph.Label.Native>) implement the method plotLabel.
+   All subclasses (<Graph.Label.HTML>) implement the method plotLabel.
 */
 
 Graph.Label = {};
-
-/*
-   Class: Graph.Label.Native
-
-   Implements labels natively, using the Canvas text API.
-*/
-Graph.Label.Native = new Class({
-    initialize: function(viz) {
-      this.viz = viz;
-    },
-
-    /*
-       Method: plotLabel
-
-       Plots a label for a given node.
-
-       Parameters:
-
-       canvas - (object) A <Canvas> instance.
-       node - (object) A <Graph.Node>.
-       controller - (object) A configuration object.
-       
-       Example:
-       
-       (start code js)
-       var viz = new $jit.Viz(options);
-       var node = viz.graph.getNode('nodeId');
-       viz.labels.plotLabel(viz.canvas, node, viz.config);
-       (end code)
-    */
-    plotLabel: function(canvas, node, controller) {
-      var ctx = canvas.getCtx();
-      var pos = node.pos.getc(true);
-
-      ctx.font = node.getLabelData('style') + ' ' + node.getLabelData('size') + 'px ' + node.getLabelData('family');
-      ctx.textAlign = node.getLabelData('textAlign');
-      ctx.fillStyle = ctx.strokeStyle = node.getLabelData('color');
-      ctx.textBaseline = node.getLabelData('textBaseline');
-
-      this.renderLabel(canvas, node, controller);
-    },
-
-    /*
-       renderLabel
-
-       Does the actual rendering of the label in the canvas. The default
-       implementation renders the label close to the position of the node, this
-       method should be overriden to position the labels differently.
-
-       Parameters:
-
-       canvas - A <Canvas> instance.
-       node - A <Graph.Node>.
-       controller - A configuration object. See also <Hypertree>, <RGraph>, <ST>.
-    */
-    renderLabel: function(canvas, node, controller) {
-      var ctx = canvas.getCtx();
-      var pos = node.pos.getc(true);
-      ctx.fillText(node.name, pos.x, pos.y + node.getData("height") / 2);
-    },
-
-    hideLabel: $.empty,
-    hideLabels: $.empty
-});
 
 /*
    Class: Graph.Label.DOM
@@ -7211,7 +6206,7 @@ $jit.ST= (function() {
             };
             
             this.controller = this.config = $.merge(
-                Options("Canvas", "Fx", "Tree", "Node", "Edge", "Controller", 
+                Options("Canvas", "Tree", "Node", "Edge", "Controller", 
                     "NodeStyles", "Events", "Navigation", "Label"), config, controller);
 
             var canvasConfig = this.config;
@@ -7234,7 +6229,7 @@ $jit.ST= (function() {
             this.graph = new Graph(this.graphOptions, this.config.Node, this.config.Edge);
             this.labels = new $ST.Label[canvasConfig.Label.type](this);
             this.fx = new $ST.Plot(this, $ST);
-            this.op = new $ST.Op(this);
+            
             this.group = new $ST.Group(this);
             this.geom = new $ST.Geom(this);
             this.clickedNode=  null;
@@ -7726,25 +6721,6 @@ $jit.ST= (function() {
 
 $jit.ST.$extend = true;
 
-/*
-   Class: ST.Op
-    
-   Custom extension of <Graph.Op>.
-
-   Extends:
-
-   All <Graph.Op> methods
-   
-   See also:
-   
-   <Graph.Op>
-
-*/
-$jit.ST.Op = new Class({
-
-  Implements: Graph.Op
-    
-});
 
 /*
     
@@ -8271,7 +7247,7 @@ $jit.ST.Plot = new Class({
   Class: ST.Label
 
   Custom extension of <Graph.Label>. 
-  Contains custom  <Graph.Label.HTML> and <Graph.Label.Native> extensions.
+  Contains custom  <Graph.Label.HTML> extensions
 
   Extends:
 
@@ -8279,35 +7255,9 @@ $jit.ST.Plot = new Class({
 
   See also:
 
-  <Graph.Label>, <Graph.Label.Native>, <Graph.Label.HTML>
+  <Graph.Label>,  <Graph.Label.HTML>
  */ 
 $jit.ST.Label = {};
-
-/*
-   ST.Label.Native
-
-   Custom extension of <Graph.Label.Native>.
-
-   Extends:
-
-   All <Graph.Label.Native> methods
-
-   See also:
-
-   <Graph.Label.Native>
-*/
-$jit.ST.Label.Native = new Class({
-  Implements: Graph.Label.Native,
-
-  renderLabel: function(canvas, node, controller) {
-    var ctx = canvas.getCtx(),
-        coord = node.pos.getc(true),
-        width = node.getData('width'),
-        height = node.getData('height'),
-        pos = this.viz.fx.getAlignedPos(coord, width, height);
-    ctx.fillText(node.name, pos.x + width / 2, pos.y + height / 2);
-  }
-});
 
 $jit.ST.Label.DOM = new Class({
   Implements: Graph.Label.DOM,
@@ -8436,48 +7386,6 @@ $jit.ST.Plot.NodeTypes = new Class({
     'render': $.empty,
     'contains': $.lambda(false)
   },
-  'circle': {
-    'render': function(node, canvas) {
-      var dim  = node.getData('dim'),
-          pos = this.getAlignedPos(node.pos.getc(true), dim, dim),
-          dim2 = dim/2;
-      this.nodeHelper.circle.render('fill', {x:pos.x+dim2, y:pos.y+dim2}, dim2, canvas);
-    },
-    'contains': function(node, pos) {
-      var dim  = node.getData('dim'),
-          npos = this.getAlignedPos(node.pos.getc(true), dim, dim),
-          dim2 = dim/2;
-      this.nodeHelper.circle.contains({x:npos.x+dim2, y:npos.y+dim2}, pos, dim2);
-    }
-  },
-  'square': {
-    'render': function(node, canvas) {
-      var dim  = node.getData('dim'),
-          dim2 = dim/2,
-          pos = this.getAlignedPos(node.pos.getc(true), dim, dim);
-      this.nodeHelper.square.render('fill', {x:pos.x+dim2, y:pos.y+dim2}, dim2, canvas);
-    },
-    'contains': function(node, pos) {
-      var dim  = node.getData('dim'),
-          npos = this.getAlignedPos(node.pos.getc(true), dim, dim),
-          dim2 = dim/2;
-      this.nodeHelper.square.contains({x:npos.x+dim2, y:npos.y+dim2}, pos, dim2);
-    }
-  },
-  'ellipse': {
-    'render': function(node, canvas) {
-      var width = node.getData('width'),
-          height = node.getData('height'),
-          pos = this.getAlignedPos(node.pos.getc(true), width, height);
-      this.nodeHelper.ellipse.render('fill', {x:pos.x+width/2, y:pos.y+height/2}, width, height, canvas);
-    },
-    'contains': function(node, pos) {
-      var width = node.getData('width'),
-          height = node.getData('height'),
-          npos = this.getAlignedPos(node.pos.getc(true), width, height);
-      this.nodeHelper.ellipse.contains({x:npos.x+width/2, y:npos.y+height/2}, pos, width, height);
-    }
-  },
   'rectangle': {
     'render': function(node, canvas) {
       var width = node.getData('width'),
@@ -8521,106 +7429,6 @@ $jit.ST.Plot.NodeTypes = new Class({
 */
 $jit.ST.Plot.EdgeTypes = new Class({
     'none': $.empty,
-    'line': {
-      'render': function(adj, canvas) {
-        var orn = this.getOrientation(adj),
-            nodeFrom = adj.nodeFrom, 
-            nodeTo = adj.nodeTo,
-            rel = nodeFrom._depth < nodeTo._depth,
-            from = this.viz.geom.getEdge(rel? nodeFrom:nodeTo, 'begin', orn),
-            to =  this.viz.geom.getEdge(rel? nodeTo:nodeFrom, 'end', orn);
-        this.edgeHelper.line.render(from, to, canvas);
-      },
-      'contains': function(adj, pos) {
-        var orn = this.getOrientation(adj),
-            nodeFrom = adj.nodeFrom, 
-            nodeTo = adj.nodeTo,
-            rel = nodeFrom._depth < nodeTo._depth,
-            from = this.viz.geom.getEdge(rel? nodeFrom:nodeTo, 'begin', orn),
-            to =  this.viz.geom.getEdge(rel? nodeTo:nodeFrom, 'end', orn);
-        return this.edgeHelper.line.contains(from, to, pos, this.edge.epsilon);
-      }
-    },
-     'arrow': {
-       'render': function(adj, canvas) {
-         var orn = this.getOrientation(adj),
-             node = adj.nodeFrom, 
-             child = adj.nodeTo,
-             dim = adj.getData('dim'),
-             from = this.viz.geom.getEdge(node, 'begin', orn),
-             to = this.viz.geom.getEdge(child, 'end', orn),
-             direction = adj.data.$direction,
-             inv = (direction && direction.length>1 && direction[0] != node.id);
-         this.edgeHelper.arrow.render(from, to, dim, inv, canvas);
-       },
-       'contains': function(adj, pos) {
-         var orn = this.getOrientation(adj),
-             nodeFrom = adj.nodeFrom, 
-             nodeTo = adj.nodeTo,
-             rel = nodeFrom._depth < nodeTo._depth,
-             from = this.viz.geom.getEdge(rel? nodeFrom:nodeTo, 'begin', orn),
-             to =  this.viz.geom.getEdge(rel? nodeTo:nodeFrom, 'end', orn);
-         return this.edgeHelper.arrow.contains(from, to, pos, this.edge.epsilon);
-       }
-     },
-    'quadratic:begin': {
-       'render': function(adj, canvas) {
-          var orn = this.getOrientation(adj);
-          var nodeFrom = adj.nodeFrom, 
-              nodeTo = adj.nodeTo,
-              rel = nodeFrom._depth < nodeTo._depth,
-              begin = this.viz.geom.getEdge(rel? nodeFrom:nodeTo, 'begin', orn),
-              end =  this.viz.geom.getEdge(rel? nodeTo:nodeFrom, 'end', orn),
-              dim = adj.getData('dim'),
-              ctx = canvas.getCtx();
-          ctx.beginPath();
-          ctx.moveTo(begin.x, begin.y);
-          switch(orn) {
-            case "left":
-              ctx.quadraticCurveTo(begin.x + dim, begin.y, end.x, end.y);
-              break;
-            case "right":
-              ctx.quadraticCurveTo(begin.x - dim, begin.y, end.x, end.y);
-              break;
-            case "top":
-              ctx.quadraticCurveTo(begin.x, begin.y + dim, end.x, end.y);
-              break;
-            case "bottom":
-              ctx.quadraticCurveTo(begin.x, begin.y - dim, end.x, end.y);
-              break;
-          }
-          ctx.stroke();
-        }
-     },
-    'quadratic:end': {
-       'render': function(adj, canvas) {
-          var orn = this.getOrientation(adj);
-          var nodeFrom = adj.nodeFrom, 
-              nodeTo = adj.nodeTo,
-              rel = nodeFrom._depth < nodeTo._depth,
-              begin = this.viz.geom.getEdge(rel? nodeFrom:nodeTo, 'begin', orn),
-              end =  this.viz.geom.getEdge(rel? nodeTo:nodeFrom, 'end', orn),
-              dim = adj.getData('dim'),
-              ctx = canvas.getCtx();
-          ctx.beginPath();
-          ctx.moveTo(begin.x, begin.y);
-          switch(orn) {
-            case "left":
-              ctx.quadraticCurveTo(end.x - dim, end.y, end.x, end.y);
-              break;
-            case "right":
-              ctx.quadraticCurveTo(end.x + dim, end.y, end.x, end.y);
-              break;
-            case "top":
-              ctx.quadraticCurveTo(end.x, end.y - dim, end.x, end.y);
-              break;
-            case "bottom":
-              ctx.quadraticCurveTo(end.x, end.y + dim, end.x, end.y);
-              break;
-          }
-          ctx.stroke();
-       }
-     },
     'bezier': {
        'render': function(adj, canvas) {
          var orn = this.getOrientation(adj),
