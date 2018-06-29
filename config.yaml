@@ -1,0 +1,21 @@
+#reqires the root node as part of the infovizualization
+#parent is hostname of it's parent in the display tree
+#hostnames must be unique
+#loops break things, im working on a way to detect them
+---
+#example host below
+-
+ hostname: myhost
+ ip: 192.168.1.1
+ parent: root
+ services:
+ -
+  name: ssh
+  port: 22
+  check: "ssh root@192.168.1.1 -p examplePassword"
+ -
+  name: rdp
+  port: 3389
+  check: "xrdp "
+
+ 
